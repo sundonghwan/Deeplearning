@@ -38,6 +38,21 @@ def col2im(col, input_shape, filter_h, filter_w, stride=1, pad=0):
             img[:, :, y:y_max:stride, x:x_max:stride] += col[:, :, y, x, :, :]
 
     return img[:, :, pad:H + pad, pad:W + pad]
+def softmax(y_pred):
+    # 입력이 (batch_size, num_classes)라고 가정
+    
+    # 1. 오버플로우 방지를 위해 각 샘플의 최댓값을 뺍니다.
+    c = np.max(y_pred, axis=1, keepdims=True)
+    
+    # 2. 최댓값을 뺀 값으로 exp를 계산합니다. (가장 큰 값이 0이 되므로 exp 결과는 최대 1)
+    z = np.exp(y_pred - c)
+    # 차원이 1차원인 경우에는 axis 를 제거
+    if z.ndim == 1:
+        t = np.sum(z)
+    else:
+        t = np.sum(z, axis=1, keepdims=True)
+    
+    return z / t
 
 if __name__ == "__main__":
     # im2col 테스트
@@ -71,3 +86,4 @@ if __name__ == "__main__":
     print(reconstructed[0, 0])
 
 
+    
